@@ -3,6 +3,7 @@ body {
 }
 
 .main {
+  text-align: center;
   width: auto;
   background-color: #fff;
   margin-left: 40%;
@@ -24,9 +25,11 @@ body {
   border-top-right-radius: 20px;
   border-bottom-right-radius: 20px;
   color: #fff;
+  overflow-x: hidden;
 }
 
 .sidenav nav {
+  border-top: 1px solid #fff;
   margin: 20px;
   padding: 5px;
   align-items: center;
@@ -38,15 +41,24 @@ a {
   text-decoration: none;
   list-style-type: none;
   margin-top: 5px;
+  transition: ease-out 0.5s;
 }
+
+.sidenav a:hover {
+  padding: 0 100px 0 100px;
+  background-color: #fff;
+  cursor: pointer;
+  color: #000000;
+}
+
 .sidenav li {
   list-style-type: none;
   margin-top: 20px;
 }
 
 .sidenav-header {
+  margin: 20px 20px 50px 20px;
   text-align: center;
-  border-bottom: 1px solid #fff;
 }
 
 .sidenav button {

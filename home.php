@@ -36,7 +36,7 @@ if (!isset($_SESSION["id"]) || !isset($_SESSION["username"])) {
         </nav>
     </div>
     <div class="main">
-        <h1>HOME PAGeE</h1>
+        <h1>Friend list</h1>
     </div>
 
 
