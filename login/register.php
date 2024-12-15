@@ -25,7 +25,7 @@ if (isset($_POST["create_account"])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Vennza Web - Create Account</title>
+    <title>Emergency Alert</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -46,6 +46,8 @@ if (isset($_POST["create_account"])) {
 
         .main {
             padding: 0px 10px;
+            animation: fadeIn 0.5s ease-out;
+
         }
 
         @media screen and (max-height: 450px) {
@@ -89,7 +91,21 @@ if (isset($_POST["create_account"])) {
         .login-main-text {
             margin-top: 20%;
             padding: 60px;
-            color: #000;
+            color: #fff;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .login-main-text h2 {
@@ -99,7 +115,7 @@ if (isset($_POST["create_account"])) {
 
         .btn-black {
             background-color: #4CAF50 !important;
-            color: #000;
+            color: #fff;
         }
     </style>
 </head>
@@ -107,7 +123,7 @@ if (isset($_POST["create_account"])) {
 <body>
     <div class="sidenav">
         <div class="login-main-text">
-            <h2>EMERGENCY<br>ALERT</h2>
+            <h2>REGISTER</h2>
             <p>Create your account.</p>
         </div>
     </div>
@@ -124,9 +140,12 @@ if (isset($_POST["create_account"])) {
                         <input type="password" name="password" class="form-control" placeholder="Password" required>
                     </div>
                     <button type="submit" name="create_account" value="create_account" class="btn btn-black mt-2">Create Account</button>
+                    <a href="login.php" class="btn btn-secondary mt-1">back</a>
+
             </div>
         </div>
     </div>
+
 
     <!-- Modal YANG BERHASIL -->
     <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
@@ -140,7 +159,7 @@ if (isset($_POST["create_account"])) {
                     Registration successful!
                 </div>
                 <div class="modal-footer">
-                    <a href="index.php" class="btn btn-primary">Go to Login</a>
+                    <a href="../home.php" class="btn btn-primary">Go to Login</a>
                 </div>
             </div>
         </div>

@@ -25,16 +25,17 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
 
         if ($result && mysqli_num_rows($result) > 0) {
             $row = mysqli_fetch_assoc($result);
-            $_SESSION['user_name'] = $row['user_name'];
+            $_SESSION['username'] = $row['username'];
             $_SESSION['name'] = $row['name'];
             $_SESSION['id'] = $row['id'];
-            header("Location: home.php");
+            header("Location: ../home.php");
             exit;
         } else {
             $error = "Incorrect username or password";
         }
     }
 }
+
 ?>
 
 <!doctype html>
@@ -43,7 +44,7 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Vennza Web</title>
+    <title>Emergency Alert</title>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -64,6 +65,8 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
 
         .main {
             padding: 0px 10px;
+            animation: fadeIn 0.5s ease-out;
+
         }
 
         @media screen and (max-height: 450px) {
@@ -107,7 +110,21 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
         .login-main-text {
             margin-top: 20%;
             padding: 60px;
-            color: #000;
+            color: #fff;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .login-main-text h2 {
@@ -117,7 +134,7 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
 
         .btn-black {
             background-color: #4CAF50 !important;
-            color: #000;
+            color: #fff;
         }
     </style>
 </head>
@@ -125,10 +142,11 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
 <body>
     <div class="sidenav">
         <div class="login-main-text">
-            <h2>EMERGENCY<br>ALERT</h2>
+            <h2>LOGIN</h2>
             <p>Login or register from here to access.</p>
         </div>
     </div>
+
     <div class="main">
         <div class="col-md-6 col-sm-12">
             <div class="login-form">
