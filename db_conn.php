@@ -9,3 +9,4 @@ $conn = mysqli_connect($host, $user, $password, $db);
 if (!$conn) {
     echo "connection sql failed";
 }
+//ini edit
