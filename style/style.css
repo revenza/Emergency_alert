@@ -1,0 +1,56 @@
+body {
+  font-family: "poppins", serif;
+}
+
+.main {
+  width: auto;
+  background-color: #fff;
+  margin-left: 40%;
+}
+
+.sidenav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  background: rgb(76, 175, 80);
+  background: linear-gradient(
+    0deg,
+    rgba(76, 175, 80, 1) 60%,
+    rgba(4, 102, 7, 1) 94%
+  );
+  width: 30%;
+  height: 100%;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  color: #fff;
+}
+
+.sidenav nav {
+  margin: 20px;
+  padding: 5px;
+  align-items: center;
+}
+
+.sidenav ul,
+a {
+  color: #fff;
+  text-decoration: none;
+  list-style-type: none;
+  margin-top: 5px;
+}
+.sidenav li {
+  list-style-type: none;
+  margin-top: 20px;
+}
+
+.sidenav-header {
+  text-align: center;
+  border-bottom: 1px solid #fff;
+}
+
+.sidenav button {
+  margin-top: 80%;
+  border-radius: 10px;
+  padding: 10px 20px;
+}
