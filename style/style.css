@@ -1,12 +1,78 @@
 body {
   font-family: "poppins", serif;
+  background-color: #f9f9f9;
+}
+
+body::-webkit-scrollbar {
+  display: none;
 }
 
 .main {
   text-align: center;
-  width: auto;
-  background-color: #fff;
-  margin-left: 40%;
+  margin-left: 18%;
+  padding: 20px;
+}
+
+.main-content {
+  margin: 0 auto;
+  margin-top: 2rem;
+}
+
+.add-kontak {
+  position: fixed;
+  right: 0;
+  margin-right: 20px;
+}
+
+.main nav {
+  z-index: 999;
+}
+
+.contact-card {
+  border-radius: 10px;
+  box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.5);
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+  border: 1px solid #d8d3d3;
+}
+
+.contact-card:hover {
+  transform: translateY(-5px);
+  background-color: #8ac975;
+}
+
+.contact-info {
+  display: flex;
+  align-items: center;
+}
+
+.contact-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.contact-actions .btn {
+  font-size: 0.9rem;
+}
+
+.contact-actions .btn-sm {
+  padding: 5px 10px;
+}
+
+/* Modal Styles */
+.modal-content {
+  border-radius: 8px;
+}
+
+.modal-header .btn-close {
+  background-color: #ddd;
+}
+
+.modal-body p {
+  font-size: 1rem;
 }
 
 .sidenav {
@@ -20,10 +86,10 @@ body {
     rgba(76, 175, 80, 1) 60%,
     rgba(4, 102, 7, 1) 94%
   );
-  width: 30%;
+  width: 20%;
   height: 100%;
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
+  /* border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px; */
   color: #fff;
   overflow-x: hidden;
 }
@@ -45,10 +111,8 @@ a {
 }
 
 .sidenav a:hover {
-  padding: 0 100px 0 100px;
-  background-color: #fff;
   cursor: pointer;
-  color: #000000;
+  color: #7dcf9f;
 }
 
 .sidenav li {
