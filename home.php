@@ -1,10 +1,40 @@
 <?php
 session_start();
+
+include 'db_conn.php';
+
 if (!isset($_SESSION["id"]) || !isset($_SESSION["username"])) {
     header("location: login/login.php");
     exit();
 }
+
+$user_id = $_SESSION["id"];
+$result = $conn->query("SELECT id, name, phone FROM contact WHERE user_id = '$user_id'");
+
+// Jika tombol tambah kontak ditekan
+if (isset($_POST['addContact'])) {
+    $nama = $_POST['contactName'];
+    $no_hp = $_POST['contactPhone'];
+    $conn->query("INSERT INTO contact (name, phone, user_id) VALUES ('$nama', '$no_hp', '$user_id')");
+    header('Location: home.php');
+}
+
+// Jika tombol cari ditekan
+if (isset($_POST['cari'])) {
+    $result = cari($_POST['keyword']);
+}
+
+function cari($keyword)
+{
+    global $conn;
+    $user_id = $_SESSION["id"];
+    $result = $conn->query("SELECT id, name, phone FROM contact WHERE user_id = '$user_id' AND name LIKE '%$keyword%'");
+    return $result;
+}
 ?>
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -39,77 +69,92 @@ if (!isset($_SESSION["id"]) || !isset($_SESSION["username"])) {
         <!-- Navbar -->
         <nav class="navbar bg-body-tertiary mb-5" style="margin-left:0">
             <div class="container d-flex justify-content-between">
-                <form class="d-flex" role="search" style="position: fixed;">
-                    <input class="form-control" style="width: 1000px; padding:20px; padding-right: 60px;" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);" type="submit">
+                <!-- Form Pencarian -->
+                <form action="" method="post" class="d-flex" role="search" style="position: fixed;">
+                    <input name="keyword" class="form-control" style="width: 1000px; padding:20px; padding-right: 60px;" type="search" placeholder="Search" aria-label="Search" autofocus>
+                    <button name="cari" class="btn" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);" type="submit">
                         <i data-feather="search"></i>
                     </button>
                 </form>
-            </div>
-            <div class="add-kontak">
-                <button type="button" class="btn btn-success" data-bs-target="#addContactModal" data-bs-toggle="modal"><i data-feather="user-plus"></i></button>
+
+                <!-- Tombol Add Kontak -->
+                <div class="add-kontak">
+                    <button type="button" class="btn btn-success" data-bs-target="#addContactModal" data-bs-toggle="modal">
+                        <i data-feather="user-plus"></i>
+                    </button>
+                </div>
             </div>
         </nav>
 
-        <!-- Modal for Add Contact -->
+
+        <!-- Modal untuk Add Contact -->
+        <!-- Modal Add Contact -->
         <div class="modal fade" id="addContactModal" tabindex="-1" aria-labelledby="addContactModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addContactModalLabel">Add Contact</h5>
+                        <h5 class="modal-title" id="addContactModalLabel">Tambah Kontak Baru</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                        <form>
+                    <form action="home.php" method="post"> <!-- Form khusus untuk tambah kontak -->
+                        <div class="modal-body">
                             <div class="mb-3">
-                                <input type="text" class="form-control" id="contactName" placeholder="Enter name">
+                                <input type="text" name="contactName" class="form-control" id="contactName" placeholder="Masukkan Nama" required>
                             </div>
                             <div class="mb-3">
-                                <input type="text" class="form-control" id="contactPhone" placeholder="Enter phone number">
+                                <input type="text" name="contactPhone" class="form-control" id="contactPhone" placeholder="Masukkan Nomor HP" value="62" required>
                             </div>
-                            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
-                        </form>
-                    </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" name="addContact" class="btn btn-success">Simpan Kontak</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
+
 
         <div class="main-content w-100 mx-3">
-            <div class="contact-card d-flex justify-content-between align-items-center p-3 shadow-sm rounded">
-                <div class="contact-info align-items-center">
-                    <div class="contact-name">
-                        <h5 class="mb-0">Ravenza Raditya</h5>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <div class="contact-card d-flex justify-content-between align-items-center p-3 shadow-sm rounded">
+                    <div class="contact-info align-items-center">
+                        <div class="contact-name">
+                            <h5 class="mb-0"><?php echo htmlspecialchars($row['name']); ?></h5>
+                        </div>
+                    </div>
+                    <div class="contact-actions">
+                        <a href="edit_contact.php?id=<?php echo $row['id']; ?>" class="mx-2">
+                            <i data-feather="edit-3" style="color: black;"></i>
+                        </a>
+                        <a href="delete_contact.php?id=<?php echo $row['id']; ?>" class="mx-2" onclick="return confirm('Are you sure you want to delete this contact?');">
+                            <i data-feather="trash-2" style="color: black;"></i>
+                        </a>
+                        <button class="btn btn-info btn-sm mx-2" data-bs-toggle="modal" data-bs-target="#shareLocationModal<?php echo $row['id']; ?>">Kirim Lokasi</button>
                     </div>
                 </div>
-                <div class="contact-actions">
-                    <a href="#" class="mx-2">
-                        <i data-feather="edit-3" style="color: black;"></i>
-                    </a>
-                    <a href="#" class="mx-2">
-                        <i data-feather="trash-2" style="color: black;"></i>
-                    </a>
-                    <a href="#" class="mx-2">
-                        <i class="mx-2" data-feather="more-vertical" style="color: black;" data-bs-toggle="modal" data-bs-target="#locationModal"></i>
-                        <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#shareLocationModal">Kirim Lokasi</button>
-                    </a>
+
+                <!-- Modal untuk Share Location -->
+                <div class="modal fade" id="shareLocationModal<?php echo $row['id']; ?>" tabindex="-1" aria-labelledby="shareLocationModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="shareLocationModalLabel">Share Location</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Share location for: <strong><?php echo htmlspecialchars($row['name']); ?></strong></p>
+                                <p>Phone: <?php echo htmlspecialchars($row['phone']); ?></p>
+                                <p>Note!: Harap menginstall aplikasi whatsapp pada pc atau handphone anda</p>
+                                <a href="#" id="sendLocation<?php echo $row['id']; ?>" class="btn btn-info">Kirim</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            <?php endwhile; ?>
         </div>
 
-        <!-- Modal for Detail -->
-        <div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="locationModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="locationModalLabel">Detail Kontak</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Nomor HP: +62 83183273382</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Modal for Share Location -->
         <div class="modal fade" id="shareLocationModal" tabindex="-1" aria-labelledby="shareLocationModalLabel" aria-hidden="true">
@@ -127,6 +172,41 @@ if (!isset($_SESSION["id"]) || !isset($_SESSION["username"])) {
             </div>
         </div>
 
+        <!-- event listener untuk tombol kirim -->
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                <?php foreach ($result as $row) : ?>
+                    document.getElementById('sendLocation<?php echo $row['id']; ?>').addEventListener('click', function() {
+                        const phoneNumber = "<?php echo $row['phone']; ?>";
+                        sendLocation(<?php echo $row['id']; ?>, phoneNumber);
+                    });
+                <?php endforeach; ?>
+            });
+        </script>
+
+        <!-- function untuk ngirim lokasi -->
+        <script>
+            function sendLocation(contactId, phoneNumber) {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+
+                        // Membuat URL WhatsApp dengan pesan lokasi yang sudah di-encode
+                        const message = `Lokasi saya adalah https://www.google.com/maps?q=${latitude},${longitude}`;
+                        const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+
+                        // Membuka WhatsApp Web dan mengisi pesan otomatis
+                        window.open(whatsappUrl, '_blank'); // Membuka tab baru dengan WhatsApp Web
+
+                    }, function(error) {
+                        alert("Gagal mendapatkan lokasi. Pastikan GPS aktif.");
+                    });
+                } else {
+                    alert("Geolocation tidak didukung oleh browser ini.");
+                }
+            }
+        </script>
 
         <script src="https://unpkg.com/feather-icons"></script>
         <script>

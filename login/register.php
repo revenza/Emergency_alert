@@ -9,12 +9,26 @@ if (isset($_POST["create_account"])) {
     $username = $_POST["username"];
     $password = $_POST["password"];
 
-    $sql = "INSERT INTO users(username, password) VALUES ('$username','$password')";
+    $sqlCheckUser = "SELECT * FROM users WHERE username = ?";
+    $stmtCheckUser = $conn->prepare($sqlCheckUser);
+    $stmtCheckUser->bind_param("s", $username);
+    $stmtCheckUser->execute();
+    $result = $stmtCheckUser->get_result();
 
-    if ($conn->query($sql)) {
-        $registerSuccess = true;
-    } else {
+    if ($result->num_rows > 0) {
         $registerError = true;
+    } else {
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+        $sql = "INSERT INTO users(username, password) VALUES (?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $username, $hashedPassword);
+
+        if ($stmt->execute()) {
+            $registerSuccess = true;
+        } else {
+            $registerError = true;
+        }
     }
 }
 ?>
@@ -47,7 +61,6 @@ if (isset($_POST["create_account"])) {
         .main {
             padding: 0px 10px;
             animation: fadeIn 0.5s ease-out;
-
         }
 
         @media screen and (max-height: 450px) {
@@ -95,7 +108,6 @@ if (isset($_POST["create_account"])) {
             animation: fadeIn 1.5s ease-out;
         }
 
-
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -140,14 +152,13 @@ if (isset($_POST["create_account"])) {
                         <input type="password" name="password" class="form-control" placeholder="Password" required>
                     </div>
                     <button type="submit" name="create_account" value="create_account" class="btn btn-black mt-2">Create Account</button>
-                    <a href="login.php" class="btn btn-secondary mt-1">back</a>
-
+                    <a href="login.php" class="btn btn-secondary mt-1">Back</a>
+                </form>
             </div>
         </div>
     </div>
 
-
-    <!-- Modal YANG BERHASIL -->
+    <!-- Modal Success -->
     <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -165,7 +176,7 @@ if (isset($_POST["create_account"])) {
         </div>
     </div>
 
-    <!-- MODAL KALO NAMA DAN PASSWORD SUDAH ADA -->
+    <!-- Modal Error -->
     <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -174,7 +185,7 @@ if (isset($_POST["create_account"])) {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Username or password is already in use.
+                    Username is already in use.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -185,7 +196,7 @@ if (isset($_POST["create_account"])) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- BIAR MODAL NYA MUNCUL -->
+    <!-- Show Modal -->
     <script>
         <?php if ($registerSuccess): ?>
             var successModal = new bootstrap.Modal(document.getElementById('successModal'));

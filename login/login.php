@@ -20,11 +20,18 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
     } elseif (empty($password)) {
         $error = "Password is required";
     } else {
-        $sql = "SELECT * FROM users WHERE username ='$username' AND password = '$password'";
-        $result = mysqli_query($conn, $sql);
+        $sql = "SELECT * FROM users WHERE username = ? AND password = ?";
 
-        if ($result && mysqli_num_rows($result) > 0) {
-            $row = mysqli_fetch_assoc($result);
+        $stmt = $conn->prepare($sql);
+
+        $stmt->bind_param("ss", $username, $password);
+
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
             $_SESSION['username'] = $row['username'];
             $_SESSION['name'] = $row['name'];
             $_SESSION['id'] = $row['id'];
@@ -33,9 +40,10 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
         } else {
             $error = "Incorrect username or password";
         }
+
+        $stmt->close();
     }
 }
-
 ?>
 
 <!doctype html>
