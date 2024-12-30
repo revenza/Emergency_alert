@@ -7,25 +7,8 @@ body::-webkit-scrollbar {
   display: none;
 }
 
-.main {
-  text-align: center;
-  margin-left: 18%;
-  padding: 20px;
-}
-
-.main-content {
-  margin: 0 auto;
-  margin-top: 2rem;
-}
-
 .add-kontak {
-  position: fixed;
-  right: 0;
-  margin-right: 20px;
-}
-
-.main nav {
-  z-index: 999;
+  position: relative;
 }
 
 .contact-card {
@@ -37,6 +20,34 @@ body::-webkit-scrollbar {
   align-items: center;
   transition: all 0.3s ease;
   border: 1px solid #d8d3d3;
+  animation: fadeIn 0.7s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.add-kontak {
+  animation: opacity 2.5s ease-out;
+  transition: all 0.3s ease;
+}
+
+@keyframes opacity {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .contact-card:hover {
@@ -73,60 +84,4 @@ body::-webkit-scrollbar {
 
 .modal-body p {
   font-size: 1rem;
-}
-
-.sidenav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  background: rgb(76, 175, 80);
-  background: linear-gradient(
-    0deg,
-    rgba(76, 175, 80, 1) 60%,
-    rgba(4, 102, 7, 1) 94%
-  );
-  width: 20%;
-  height: 100%;
-  /* border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px; */
-  color: #fff;
-  overflow-x: hidden;
-}
-
-.sidenav nav {
-  border-top: 1px solid #fff;
-  margin: 20px;
-  padding: 5px;
-  align-items: center;
-}
-
-.sidenav ul,
-a {
-  color: #fff;
-  text-decoration: none;
-  list-style-type: none;
-  margin-top: 5px;
-  transition: ease-out 0.5s;
-}
-
-.sidenav a:hover {
-  cursor: pointer;
-  color: #7dcf9f;
-}
-
-.sidenav li {
-  list-style-type: none;
-  margin-top: 20px;
-}
-
-.sidenav-header {
-  margin: 20px 20px 50px 20px;
-  text-align: center;
-}
-
-.sidenav button {
-  margin-top: 80%;
-  border-radius: 10px;
-  padding: 10px 20px;
 }

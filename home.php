@@ -4,22 +4,34 @@ session_start();
 include 'db_conn.php';
 
 if (!isset($_SESSION["id"]) || !isset($_SESSION["username"])) {
-    header("location: login/login.php");
+    header("location: splash.php/index.php");
     exit();
 }
 
 $user_id = $_SESSION["id"];
 $result = $conn->query("SELECT id, name, phone FROM contact WHERE user_id = '$user_id'");
 
-// Jika tombol tambah kontak ditekan
 if (isset($_POST['addContact'])) {
-    $nama = $_POST['contactName'];
-    $no_hp = $_POST['contactPhone'];
-    $conn->query("INSERT INTO contact (name, phone, user_id) VALUES ('$nama', '$no_hp', '$user_id')");
-    header('Location: home.php');
+    $nama = trim($_POST['contactName']);
+    $no_hp = trim($_POST['contactPhone']);
+
+    if ($no_hp === "62") {
+        $error = "Nomor HP tidak boleh hanya 62. Silakan masukkan nomor lengkap.";
+    } elseif (!is_numeric($no_hp)) {
+        $error = "Nomor HP hanya boleh berisi angka.";
+    } else {
+        $stmt = $conn->prepare("INSERT INTO contact (name, phone, user_id) VALUES (?, ?, ?)");
+        $stmt->bind_param("ssi", $nama, $no_hp, $user_id);
+
+        if ($stmt->execute()) {
+            header('Location: home.php');
+            exit();
+        } else {
+            $error = "Gagal menambahkan kontak. Silakan coba lagi.";
+        }
+    }
 }
 
-// Jika tombol cari ditekan
 if (isset($_POST['cari'])) {
     $result = cari($_POST['keyword']);
 }
@@ -28,10 +40,16 @@ function cari($keyword)
 {
     global $conn;
     $user_id = $_SESSION["id"];
-    $result = $conn->query("SELECT id, name, phone FROM contact WHERE user_id = '$user_id' AND name LIKE '%$keyword%'");
-    return $result;
+
+    $stmt = $conn->prepare("SELECT id, name, phone FROM contact WHERE user_id = ? AND name LIKE ?");
+    $like_keyword = "%" . $keyword . "%";
+    $stmt->bind_param("is", $user_id, $like_keyword);
+    $stmt->execute();
+
+    return $stmt->get_result();
 }
 ?>
+
 
 
 
@@ -52,42 +70,43 @@ function cari($keyword)
 </head>
 
 <body>
-    <div class="sidenav">
-        <div class="sidenav-header">
-            <h2>EMERGENCY ALERT</h2>
-        </div>
 
-        <nav>
-            <ul>
-                <li><a href=#>Dashboard</a></li>
-                <li><a href="blog.php">Blog</a></li>
-                <li><a href="login/logout.php"><button>logout</button></a></li>
-            </ul>
-        </nav>
-    </div>
-    <div class="main">
-        <!-- Navbar -->
-        <nav class="navbar bg-body-tertiary mb-5" style="margin-left:0">
-            <div class="container d-flex justify-content-between">
-                <!-- Form Pencarian -->
-                <form action="" method="post" class="d-flex" role="search" style="position: fixed;">
-                    <input name="keyword" class="form-control" style="width: 1000px; padding:20px; padding-right: 60px;" type="search" placeholder="Search" aria-label="Search" autofocus>
-                    <button name="cari" class="btn" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);" type="submit">
-                        <i data-feather="search"></i>
-                    </button>
+    <!-- navbar -->
+    <nav class="navbar navbar-expand-lg bg-success navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Emergency Alert</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="Home.php">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="blog.php">Blog</a>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link active text-dangger" aria-current="page" href="login/logout.php"> <i data-feather="log-out" style="color: tomato;"></i></a>
+                    </li>
+                </ul>
+                <form action="" method="post" class="d-flex" role="search">
+                    <input name="keyword" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button name="cari" class="btn btn-outline-light" type="submit">Search</button>
                 </form>
-
-                <!-- Tombol Add Kontak -->
-                <div class="add-kontak">
-                    <button type="button" class="btn btn-success" data-bs-target="#addContactModal" data-bs-toggle="modal">
-                        <i data-feather="user-plus"></i>
-                    </button>
-                </div>
             </div>
-        </nav>
+        </div>
+    </nav>
+    <!-- Main Content -->
+    <div class="container-fluid main mt-5">
+        <!-- Tombol Add Kontak -->
+        <div class="add-kontak">
+            <button type="button" class="btn  d-flex align-items-center" data-bs-target="#addContactModal" data-bs-toggle="modal">
+                <i data-feather="user-plus"></i>
+                <p class="text ms-2 mb-0">add contact</p>
 
-
-        <!-- Modal untuk Add Contact -->
+            </button>
+        </div>
         <!-- Modal Add Contact -->
         <div class="modal fade" id="addContactModal" tabindex="-1" aria-labelledby="addContactModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -96,13 +115,13 @@ function cari($keyword)
                         <h5 class="modal-title" id="addContactModalLabel">Tambah Kontak Baru</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form action="home.php" method="post"> <!-- Form khusus untuk tambah kontak -->
+                    <form action="home.php" method="post">
                         <div class="modal-body">
                             <div class="mb-3">
-                                <input type="text" name="contactName" class="form-control" id="contactName" placeholder="Masukkan Nama" required>
+                                <input type="text" name="contactName" class="form-control" id="contactName" placeholder="Masukkan Nama" maxlength="7" required>
                             </div>
                             <div class="mb-3">
-                                <input type="text" name="contactPhone" class="form-control" id="contactPhone" placeholder="Masukkan Nomor HP" value="62" required>
+                                <input type="number" name="contactPhone" class="form-control" id="contactPhone" placeholder="Masukkan Nomor HP" value="62" required>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -113,26 +132,32 @@ function cari($keyword)
                 </div>
             </div>
         </div>
+        <!-- kalo user ga ngisi no hp -->
+        <?php if (isset($error)): ?>
+            <div class="alert alert-danger">
+                <?php echo $error; ?>
+            </div>
+        <?php endif; ?>
 
-
-        <div class="main-content w-100 mx-3">
+        <div class="main-content w-100 mt-2">
             <?php while ($row = $result->fetch_assoc()): ?>
-                <div class="contact-card d-flex justify-content-between align-items-center p-3 shadow-sm rounded">
-                    <div class="contact-info align-items-center">
+                <div class="contact-card d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center p-3 shadow-sm rounded">
+                    <div class="contact-info d-flex flex-column align-items-start mb-2 mb-md-0">
                         <div class="contact-name">
                             <h5 class="mb-0"><?php echo htmlspecialchars($row['name']); ?></h5>
                         </div>
                     </div>
-                    <div class="contact-actions">
-                        <a href="edit_contact.php?id=<?php echo $row['id']; ?>" class="mx-2">
+                    <div class="contact-actions d-flex flex-wrap justify-content-start justify-content-md-end">
+                        <a href="edit_contact.php?id=<?php echo $row['id']; ?>" class="mx-2 mb-2 mb-md-0">
                             <i data-feather="edit-3" style="color: black;"></i>
                         </a>
-                        <a href="delete_contact.php?id=<?php echo $row['id']; ?>" class="mx-2" onclick="return confirm('Are you sure you want to delete this contact?');">
+                        <a href="delete_contact.php?id=<?php echo $row['id']; ?>" class="mx-2 mb-2 mb-md-0" onclick="return confirm('Are you sure you want to delete this contact?');">
                             <i data-feather="trash-2" style="color: black;"></i>
                         </a>
-                        <button class="btn btn-info btn-sm mx-2" data-bs-toggle="modal" data-bs-target="#shareLocationModal<?php echo $row['id']; ?>">Kirim Lokasi</button>
+                        <button class="btn btn-success btn-sm mx-2" data-bs-toggle="modal" data-bs-target="#shareLocationModal<?php echo $row['id']; ?>">Kirim Lokasi</button>
                     </div>
                 </div>
+
 
                 <!-- Modal untuk Share Location -->
                 <div class="modal fade" id="shareLocationModal<?php echo $row['id']; ?>" tabindex="-1" aria-labelledby="shareLocationModalLabel" aria-hidden="true">
@@ -156,7 +181,7 @@ function cari($keyword)
 
 
 
-        <!-- Modal for Share Location -->
+        <!-- Modal untuk Share Location -->
         <div class="modal fade" id="shareLocationModal" tabindex="-1" aria-labelledby="shareLocationModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -171,48 +196,48 @@ function cari($keyword)
                 </div>
             </div>
         </div>
+    </div>
+    <!-- event listener untuk tombol kirim -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            <?php foreach ($result as $row) : ?>
+                document.getElementById('sendLocation<?php echo $row['id']; ?>').addEventListener('click', function() {
+                    const phoneNumber = "<?php echo $row['phone']; ?>";
+                    sendLocation(<?php echo $row['id']; ?>, phoneNumber);
+                });
+            <?php endforeach; ?>
+        });
+    </script>
 
-        <!-- event listener untuk tombol kirim -->
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                <?php foreach ($result as $row) : ?>
-                    document.getElementById('sendLocation<?php echo $row['id']; ?>').addEventListener('click', function() {
-                        const phoneNumber = "<?php echo $row['phone']; ?>";
-                        sendLocation(<?php echo $row['id']; ?>, phoneNumber);
-                    });
-                <?php endforeach; ?>
-            });
-        </script>
+    <!-- function untuk ngirim lokasi -->
+    <script>
+        function sendLocation(contactId, phoneNumber) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
 
-        <!-- function untuk ngirim lokasi -->
-        <script>
-            function sendLocation(contactId, phoneNumber) {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(function(position) {
-                        const latitude = position.coords.latitude;
-                        const longitude = position.coords.longitude;
+                    const message = `Saya dalam keadaan darurat!!!Lokasi saya:
+                        https://www.google.com/maps?q=${latitude},${longitude}`;
+                    const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
 
-                        // Membuat URL WhatsApp dengan pesan lokasi yang sudah di-encode
-                        const message = `Lokasi saya adalah https://www.google.com/maps?q=${latitude},${longitude}`;
-                        const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+                    // Membuka WhatsApp Web dan mengisi pesan otomatis
+                    window.open(whatsappUrl, '_blank'); // Membuka tab baru dengan WhatsApp Web
 
-                        // Membuka WhatsApp Web dan mengisi pesan otomatis
-                        window.open(whatsappUrl, '_blank'); // Membuka tab baru dengan WhatsApp Web
-
-                    }, function(error) {
-                        alert("Gagal mendapatkan lokasi. Pastikan GPS aktif.");
-                    });
-                } else {
-                    alert("Geolocation tidak didukung oleh browser ini.");
-                }
+                }, function(error) {
+                    alert("Gagal mendapatkan lokasi. Pastikan GPS aktif.");
+                });
+            } else {
+                alert("Geolocation tidak didukung oleh browser ini.");
             }
-        </script>
+        }
+    </script>
 
-        <script src="https://unpkg.com/feather-icons"></script>
-        <script>
-            feather.replace();
-        </script>
-        <script src=" https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        feather.replace();
+    </script>
+    <script src=" https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 
 </html>

@@ -20,23 +20,24 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
     } elseif (empty($password)) {
         $error = "Password is required";
     } else {
-        $sql = "SELECT * FROM users WHERE username = ? AND password = ?";
-
+        $sql = "SELECT * FROM users WHERE username = ?";
         $stmt = $conn->prepare($sql);
-
-        $stmt->bind_param("ss", $username, $password);
-
+        $stmt->bind_param("s", $username);
         $stmt->execute();
-
         $result = $stmt->get_result();
 
         if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
-            $_SESSION['username'] = $row['username'];
-            $_SESSION['name'] = $row['name'];
-            $_SESSION['id'] = $row['id'];
-            header("Location: ../home.php");
-            exit;
+
+            if (password_verify($password, $row['password'])) {
+                $_SESSION['username'] = $row['username'];
+                $_SESSION['name'] = $row['name'];
+                $_SESSION['id'] = $row['id'];
+                header("Location: ../home.php");
+                exit;
+            } else {
+                $error = "Incorrect username or password";
+            }
         } else {
             $error = "Incorrect username or password";
         }
@@ -45,6 +46,7 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
     }
 }
 ?>
+
 
 <!doctype html>
 <html lang="en">

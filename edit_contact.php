@@ -44,13 +44,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="POST" class="p-4 shadow-sm rounded border">
             <div class="mb-3">
                 <label for="nama" class="form-label">Nama</label>
-                <input type="text" name="nama" id="nama" class="form-control" value="<?= htmlspecialchars($data['name']); ?>" required>
+                <input type="text" name="nama" id="nama" class="form-control" value="<?= htmlspecialchars($data['name']); ?>" maxlength="7" required>
             </div>
             <div class="mb-3">
                 <label for="no_hp" class="form-label">No HP</label>
                 <input type="text" name="no_hp" id="no_hp" class="form-control" value="<?= htmlspecialchars($data['phone']); ?>" required>
             </div>
-            <button type="submit" class="btn btn-primary">Simpan</button>
+            <button type="submit" class="btn btn-success">Simpan</button>
             <a href="home.php" class="btn btn-secondary">Batal</a>
         </form>
     </div>
