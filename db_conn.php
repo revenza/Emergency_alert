@@ -7,6 +7,5 @@ $db = "web_pelacak";
 $conn = mysqli_connect($host, $user, $password, $db);
 
 if (!$conn) {
-    echo "connection sql failed";
+    die("Connection failed: " . mysqli_connect_error());
 }
-//ini editt
