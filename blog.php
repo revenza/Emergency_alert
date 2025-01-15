@@ -53,11 +53,16 @@ $result = $conn->query($sql);
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="Home.php">Home</a>
+                        <a class="nav-link" aria-current="page" href="home.php">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="blog.php">Blog</a>
                     </li>
+                    <?php if ($_SESSION["id"] == 14): ?>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="admin.php">Admin</a>
+                        </li>
+                    <?php endif; ?>
                     <li class="nav-item">
                         <a class="nav-link active text-dangger" aria-current="page" href="login/logout.php"> <i data-feather="log-out" style="color: tomato;"></i></a>
                     </li>
