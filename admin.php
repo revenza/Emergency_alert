@@ -44,6 +44,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 $sql = "SELECT * FROM users";
 $result = $conn->query($sql);
+
+function cari($keyword)
+{
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username LIKE ?");
+    $like_keyword = "%" . $keyword . "%";
+    $stmt->bind_param("s", $like_keyword);
+    $stmt->execute();
+
+    return $stmt->get_result();
+}
+
+if (isset($_POST['cari'])) {
+    $keyword = $_POST['keyword'];
+    $result = cari($keyword);
+}
 ?>
 
 <!DOCTYPE html>
@@ -82,9 +99,9 @@ $result = $conn->query($sql);
                         <a class="nav-link active text-danger" aria-current="page" href="login/logout.php"> <i data-feather="log-out" style="color: tomato;"></i></a>
                     </li>
                 </ul>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-light" type="submit">Search</button>
+                <form action="" method="post" class="d-flex" role="search">
+                    <input name="keyword" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button name="cari" class="btn btn-outline-light" type="submit">Search</button>
                 </form>
             </div>
         </div>
