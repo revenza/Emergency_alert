@@ -16,6 +16,12 @@ $data = $result->fetch_assoc();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = $conn->real_escape_string($_POST['nama']);
     $no_hp = $conn->real_escape_string($_POST['no_hp']);
+    if (substr($no_hp, 0, 2) === '08') {
+        $no_hp = '62' . substr($no_hp, 1);
+    }
+    if (substr($no_hp, 0, 2) !== '62') {
+        die("Nomor HP harus dimulai dengan 62.");
+    }
 
     // Update data kontak
     $updateQuery = "UPDATE contact SET name='$nama', phone='$no_hp' WHERE id = $id";
@@ -81,13 +87,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="mb-3">
                 <label for="no_hp" class="form-label">No HP</label>
-                <input type="text" name="no_hp" id="no_hp" class="form-control" value="<?= htmlspecialchars($data['phone']); ?>" required>
+                <input type="text" name="no_hp" id="no_hp" class="form-control" value="<?= htmlspecialchars($data['phone']); ?>" pattern="\d*" maxlength="15" required>
             </div>
             <button type="submit" class="btn btn-success">Simpan</button>
             <a href="index.php" class="btn btn-secondary">Batal</a>
         </form>
     </div>
+    <script>
+        document.getElementById('no_hp').addEventListener('input', function(e) {
+            let value = e.target.value;
+            if (value.length > 15) {
+                e.target.value = value.slice(0, 15);
+            }
+        });
 
+        document.querySelector('form').addEventListener('submit', function(e) {
+            let noHpInput = document.getElementById('no_hp');
+            let noHpValue = noHpInput.value;
+
+            if (!/^\d+$/.test(noHpValue)) {
+                alert('Nomor HP harus berupa angka.');
+                e.preventDefault();
+                return;
+            }
+
+            if (noHpValue.startsWith('08')) {
+                noHpInput.value = '62' + noHpValue.slice(1);
+                noHpValue = noHpInput.value;
+            }
+
+            if (!noHpValue.startsWith('62')) {
+                alert('Nomor HP harus dimulai dengan 62.');
+                e.preventDefault();
+            }
+        });
+    </script>
 
     <script src="https://unpkg.com/feather-icons"></script>
     <script>

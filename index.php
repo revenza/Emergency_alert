@@ -140,10 +140,17 @@ function cari($keyword)
 
         <script>
             function validatePhoneNumber() {
-                const phoneInput = document.getElementById('contactPhone').value;
+                const phoneInput = document.getElementById('contactPhone');
+                let phoneValue = phoneInput.value;
+
+                if (phoneValue.startsWith('08')) {
+                    phoneValue = '62' + phoneValue.substring(1);
+                    phoneInput.value = phoneValue;
+                }
+
                 const phonePattern = /^[0-9]+$/;
 
-                if (!phonePattern.test(phoneInput)) {
+                if (!phonePattern.test(phoneValue)) {
                     alert('Nomor HP hanya boleh berisi angka.');
                     return false;
                 }
