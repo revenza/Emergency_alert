@@ -2,7 +2,7 @@
 session_start();
 include "../db_conn.php";
 
-if (isset($_POST["username"]) && isset($_POST["password"])) {
+if (isset($_POST["username_email"]) && isset($_POST["password"])) {
 
     function validate($data)
     {
@@ -12,17 +12,17 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
         return $data;
     }
 
-    $username = validate($_POST["username"]);
+    $username_email = validate($_POST["username_email"]);
     $password = validate($_POST["password"]);
 
-    if (empty($username)) {
-        $error = "Username is required";
+    if (empty($username_email)) {
+        $error = "Username or Email is required";
     } elseif (empty($password)) {
         $error = "Password is required";
     } else {
-        $sql = "SELECT * FROM users WHERE username = ?";
+        $sql = "SELECT * FROM users WHERE username = ? OR email = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $username);
+        $stmt->bind_param("ss", $username_email, $username_email);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -33,20 +33,19 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
                 $_SESSION['username'] = $row['username'];
                 $_SESSION['name'] = $row['name'];
                 $_SESSION['id'] = $row['id'];
-                header("Location: ../home.php");
+                header("Location: ../index.php");
                 exit;
             } else {
-                $error = "Incorrect username or password";
+                $error = "Incorrect username/email or password";
             }
         } else {
-            $error = "Incorrect username or password";
+            $error = "Incorrect username/email or password";
         }
 
         $stmt->close();
     }
 }
 ?>
-
 
 <!doctype html>
 <html lang="en">
@@ -76,7 +75,6 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
         .main {
             padding: 0px 10px;
             animation: fadeIn 0.5s ease-out;
-
         }
 
         @media screen and (max-height: 450px) {
@@ -124,7 +122,6 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
             animation: fadeIn 1.5s ease-out;
         }
 
-
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -162,8 +159,8 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
             <div class="login-form">
                 <form action="login.php" method="post">
                     <div class="form-group">
-                        <label>User Name</label>
-                        <input type="text" name="username" class="form-control" placeholder="User Name">
+                        <label>Username or Email</label>
+                        <input type="text" name="username_email" class="form-control" placeholder="Username or Email">
                     </div>
                     <div class="form-group">
                         <label>Password</label>
@@ -196,7 +193,7 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- ngetriger modal -->
+    <!-- Trigger modal -->
     <script>
         <?php if (isset($error)): ?>
             var errorModal = new bootstrap.Modal(document.getElementById('errorModal'), {

@@ -24,7 +24,7 @@ if (isset($_POST['addContact'])) {
         $stmt->bind_param("ssi", $nama, $no_hp, $user_id);
 
         if ($stmt->execute()) {
-            header('Location: home.php');
+            header('Location: index.php');
             exit();
         } else {
             $error = "Gagal menambahkan kontak. Silakan coba lagi.";
@@ -81,7 +81,7 @@ function cari($keyword)
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="home.php">Home</a>
+                        <a class="nav-link active" aria-current="page" href="index.php">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="blog.php">Blog</a>
@@ -120,13 +120,13 @@ function cari($keyword)
                         <h5 class="modal-title" id="addContactModalLabel">Tambah Kontak Baru</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form action="home.php" method="post">
+                    <form action="index.php" method="post" onsubmit="return validatePhoneNumber()">
                         <div class="modal-body">
                             <div class="mb-3">
                                 <input type="text" name="contactName" class="form-control" id="contactName" placeholder="Masukkan Nama" maxlength="7" required>
                             </div>
                             <div class="mb-3">
-                                <input type="number" name="contactPhone" class="form-control" id="contactPhone" placeholder="Masukkan Nomor HP" value="62" required>
+                                <input type="number" name="contactPhone" class="form-control" id="contactPhone" placeholder="Masukkan Nomor HP" value="62" maxlength="15" required>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -137,6 +137,19 @@ function cari($keyword)
                 </div>
             </div>
         </div>
+
+        <script>
+            function validatePhoneNumber() {
+                const phoneInput = document.getElementById('contactPhone').value;
+                const phonePattern = /^[0-9]+$/;
+
+                if (!phonePattern.test(phoneInput)) {
+                    alert('Nomor HP hanya boleh berisi angka.');
+                    return false;
+                }
+                return true;
+            }
+        </script>
         <!-- kalo user ga ngisi no hp -->
         <?php if (isset($error)): ?>
             <div class="alert alert-danger">

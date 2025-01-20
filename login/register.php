@@ -8,10 +8,12 @@ $registerError = false;
 if (isset($_POST["create_account"])) {
     $username = $_POST["username"];
     $password = $_POST["password"];
+    $email = $_POST["email"];
 
-    $sqlCheckUser = "SELECT * FROM users WHERE username = ?";
+    // Check if username or email already exists
+    $sqlCheckUser = "SELECT * FROM users WHERE username = ? OR email = ?";
     $stmtCheckUser = $conn->prepare($sqlCheckUser);
-    $stmtCheckUser->bind_param("s", $username);
+    $stmtCheckUser->bind_param("ss", $username, $email);
     $stmtCheckUser->execute();
     $result = $stmtCheckUser->get_result();
 
@@ -20,9 +22,9 @@ if (isset($_POST["create_account"])) {
     } else {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-        $sql = "INSERT INTO users(username, password) VALUES (?, ?)";
+        $sql = "INSERT INTO users(username, password, email) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $username, $hashedPassword);
+        $stmt->bind_param("sss", $username, $hashedPassword, $email);
 
         if ($stmt->execute()) {
             $registerSuccess = true;
@@ -148,6 +150,10 @@ if (isset($_POST["create_account"])) {
                         <input type="text" name="username" class="form-control" placeholder="User Name" required>
                     </div>
                     <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
                         <label>Create Password</label>
                         <input type="password" name="password" class="form-control" placeholder="Password" required>
                     </div>
@@ -170,7 +176,7 @@ if (isset($_POST["create_account"])) {
                     Registration successful!
                 </div>
                 <div class="modal-footer">
-                    <a href="../home.php" class="btn btn-primary">Go to Login</a>
+                    <a href="../index.php" class="btn btn-primary">Go to Login</a>
                 </div>
             </div>
         </div>
@@ -185,7 +191,7 @@ if (isset($_POST["create_account"])) {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Username is already in use.
+                    Username or email is already in use.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

@@ -27,7 +27,6 @@ $result = $conn->query($sql);
     <style>
         .card-body {
             max-height: 150px;
-            overflow: hidden;
         }
 
         .card-text {
@@ -38,6 +37,13 @@ $result = $conn->query($sql);
 
         .carousel {
             margin-top: 56px;
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            max-height: 300px;
         }
     </style>
 </head>
@@ -53,7 +59,7 @@ $result = $conn->query($sql);
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="home.php">Home</a>
+                        <a class="nav-link" aria-current="page" href="index.php">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="blog.php">Blog</a>
@@ -121,21 +127,19 @@ $result = $conn->query($sql);
             <!-- Blog Section -->
             <div class="col-lg-8">
                 <h2 class="mb-4">Latest Blogs</h2>
-                <div class="blog" style="height: 500px; overflow: scroll;">
+                <div class="blog" style="height: 500px; overflow-y: scroll;">
                     <?php while ($row = mysqli_fetch_assoc($result)): ?>
-                        <div class="card mb-3">
-                            <a href="blog_detail.php?id=<?php echo $row['id']; ?>">
-                                <div class="card-body">
-                                    <h5 class="card-title"><?php echo $row['title']; ?></h5>
-                                    <p class="card-text"><?php echo $row['content']; ?></p>
-                                    <?php if ($row['image']): ?>
-                                        <img src="<?php echo $row['image']; ?>" alt="Blog Image" class="img-fluid" style="max-height: 400px;">
-                                    <?php endif; ?>
-                                </div>
-                            </a>
+                        <div class="mb-4">
+                            <?php if ($row['image']): ?>
+                                <img src="<?php echo $row['image']; ?>" alt="Blog Image" class="img-fluid w-100 mb-3" style="max-height: 300px; object-fit: cover;">
+                            <?php endif; ?>
+                            <h3><?php echo $row['title']; ?></h3>
+                            <p><?php echo substr($row['content'], 0, 150); ?>...</p>
+                            <a href="blog_detail.php?id=<?php echo $row['id']; ?>" class="text-primary">Read More</a>
                         </div>
                     <?php endwhile; ?>
                 </div>
+
             </div>
 
             <!-- Sidebar Section -->

@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Update data kontak
     $updateQuery = "UPDATE contact SET name='$nama', phone='$no_hp' WHERE id = $id";
     if ($conn->query($updateQuery)) {
-        header('Location: home.php');
+        header('Location: index.php');
         exit();
     } else {
         die("Gagal mengupdate data: " . $conn->error);
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="home.php">Home</a>
+                        <a class="nav-link active" aria-current="page" href="index.php">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="blog.php">Blog</a>
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="text" name="no_hp" id="no_hp" class="form-control" value="<?= htmlspecialchars($data['phone']); ?>" required>
             </div>
             <button type="submit" class="btn btn-success">Simpan</button>
-            <a href="home.php" class="btn btn-secondary">Batal</a>
+            <a href="index.php" class="btn btn-secondary">Batal</a>
         </form>
     </div>
 
